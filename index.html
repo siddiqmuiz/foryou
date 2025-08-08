@@ -1,0 +1,123 @@
+import React, { useState } from "react"; import { motion, AnimatePresence } from "framer-motion";
+
+// Interactive flower component // - Tap / click / touch the flower to make it sway and show a floating "I love you" text. // - Uses TailwindCSS for styling and framer-motion for animations.
+
+export default function FlowerInteractive() { const [touched, setTouched] = useState(false); const [showText, setShowText] = useState(false);
+
+const handlePointerDown = () => { setTouched(true); setShowText(true); // hide the text after a moment window.setTimeout(() => setShowText(false), 1800); // reset the touch state shortly after to allow re-touches window.setTimeout(() => setTouched(false), 800); };
+
+return ( <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pink-50 to-indigo-50 p-6"> <div className="w-full max-w-md mx-auto"> <div className="text-center mb-6"> <h1 className="text-2xl font-semibold">Sentuh bunga tu 🌸</h1> <p className="text-sm text-gray-500">Sentuh / klik untuk buat ia goyang & paparkan "I love you"</p> </div>
+
+<div className="relative flex items-center justify-center">
+      {/* Floating "I love you" */}
+      <AnimatePresence>
+        {showText && (
+          <motion.div
+            initial={{ opacity: 0, y: 10, scale: 0.8 }}
+            animate={{ opacity: 1, y: -80, scale: 1 }}
+            exit={{ opacity: 0, y: -120, scale: 0.8 }}
+            transition={{ duration: 0.9, ease: "easeOut" }}
+            className="pointer-events-none absolute -top-6 text-xl font-bold"
+          >
+            <span className="bg-white/80 backdrop-blur-sm px-3 py-1 rounded-full shadow">I love you ❤️</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Flower container - use pointer events for touch */}
+      <motion.div
+        onPointerDown={handlePointerDown}
+        role="button"
+        tabIndex={0}
+        className="cursor-pointer select-none"
+        // Idle gentle sway looping
+        animate={touched ? { rotate: [0, -18, 12, -8, 6, 0] } : { rotate: [0, -2, 2, -2, 0] }}
+        transition={touched ? { duration: 0.8, ease: "easeInOut" } : { duration: 3.6, repeat: Infinity, ease: "easeInOut" }}
+      >
+        {/* Stem + pot as a flex column so the transform pivot feels natural */}
+        <div className="flex flex-col items-center">
+          {/* Flower SVG */}
+          <motion.svg
+            width="220"
+            height="220"
+            viewBox="0 0 220 220"
+            xmlns="http://www.w3.org/2000/svg"
+            className="block"
+            initial={false}
+          >
+            {/* center circle */}
+            <g transform="translate(110,90)">
+              {/* petals - simple layered petals */}
+
+              {/* Outer petals */}
+              <motion.g
+                animate={touched ? { scale: [1, 1.08, 0.96, 1.02, 1] } : { scale: [1, 1.01, 1] }}
+                transition={touched ? { duration: 0.8 } : { duration: 3, repeat: Infinity }}
+              >
+                {Array.from({ length: 8 }).map((_, i) => {
+                  const angle = (i / 8) * 360;
+                  return (
+                    <ellipse
+                      key={`p-${i}`}
+                      rx="28"
+                      ry="56"
+                      transform={`rotate(${angle}) translate(0, -40)`}
+                      fill="#FFB6C1"
+                      opacity="0.95"
+                    />
+                  );
+                })}
+              </motion.g>
+
+              {/* Inner petals */}
+              <motion.g
+                animate={touched ? { scale: [1, 0.95, 1.05, 1] } : { scale: [1, 1.005, 1] }}
+                transition={touched ? { duration: 0.7 } : { duration: 2.8, repeat: Infinity }}
+              >
+                {Array.from({ length: 6 }).map((_, i) => {
+                  const angle = (i / 6) * 360 + 15;
+                  return (
+                    <ellipse
+                      key={`ip-${i}`}
+                      rx="20"
+                      ry="36"
+                      transform={`rotate(${angle}) translate(0, -28)`}
+                      fill="#FF69B4"
+                      opacity="0.95"
+                    />
+                  );
+                })}
+              </motion.g>
+
+              {/* center disc */}
+              <circle r="22" fill="#FFD166" stroke="#E09F3E" strokeWidth="3" />
+            </g>
+          </motion.svg>
+
+          {/* Stem */}
+          <motion.div
+            className="w-1"
+            style={{ height: 120 }}
+            animate={touched ? { x: [0, 6, -6, 3, 0] } : { x: [0, 1, -1, 0] }}
+            transition={touched ? { duration: 0.8, ease: "easeInOut" } : { duration: 3, repeat: Infinity, ease: "easeInOut" }}
+          >
+            <div className="w-1 h-full bg-emerald-600 rounded-full mx-auto" />
+          </motion.div>
+
+          {/* Pot */}
+          <div className="mt-4">
+            <div className="w-36 h-12 bg-amber-100 rounded-b-2xl border border-amber-300 flex items-center justify-center shadow-sm">
+              <span className="text-sm text-amber-800">Bunga untukmu</span>
+            </div>
+          </div>
+        </div>
+      </motion.div>
+    </div>
+
+    <div className="mt-6 text-center text-xs text-gray-500">Tip: Sentuh sekali lagi untuk ulang animasi.</div>
+  </div>
+</div>
+
+); }
+
+            
